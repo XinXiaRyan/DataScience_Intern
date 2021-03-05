@@ -1,0 +1,126 @@
+---
+title: "test_nlp"
+author: "xxia351"
+date: "16/01/2021"
+output: html_document
+---
+#function: nlp_extraction
+```{r}
+nlp_extraction = function(is_speaker1_tutor,threshold,raw_data){
+if(is_speaker1_tutor == 1) {data<- raw_data %>%
+  mutate("Speaker" = ifelse(as.character(Speaker) == "Speaker 1:", "tutor","learner"))}
+if(is_speaker1_tutor == 0){
+  data<- raw_data %>%
+  mutate("Speaker" = ifelse(as.character(Speaker) == "Speaker 1:", "learner","tutor"))}
+data2 = subset(data, Duration >threshold)
+learner_data <- data2 %>% filter(Speaker=="learner");tutor_data <-  data2 %>% filter(Speaker=="tutor")
+#prepare the data
+total_data <- data2 %>% group_by(Speaker) %>% summarise(sum(Duration))
+#learner 
+`L_airtime%` <- total_data[1,2] / sum(total_data[,2])
+`L_avgTurnLength[s]` <- total_data[1,2] / nrow(learner_data)
+`L_longestTurnLength[s]` <- max(learner_data[,"Duration"])
+`L_totalTurnLength` <- total_data[1,2]
+`L_totalTurns` <-  nrow(learner_data)
+#tutor
+`T_airtime%` <- total_data[2,2] / sum(total_data[,2])
+`T_avgTurnLength[s]` <- total_data[2,2] / nrow(tutor_data)
+`T_longestTurnLength[s]` <- max(tutor_data[,"Duration"])
+`T_totalTurnLength` <- total_data[2,2]
+`T_totalTurns` <-  nrow(tutor_data)
+#total
+`Video_time` <- data[nrow(data),2]+data[nrow(data),3]
+`Delta_turn` <- nrow(data)-nrow(data2)
+`Delta_Time_treshold` <- data[nrow(data),2]+data[nrow(data),3] - sum(total_data[,2])
+
+#h1
+half_paremater <- sum(data[,3]) / 2
+h1 <- data[1:(rev(which(data$Time2 < half_paremater))[1]+1),] %>% subset(Duration >threshold);
+h1total_data <- h1 %>% group_by(Speaker) %>% summarise(sum(Duration))
+h1learner_data <- h1 %>% filter(Speaker=="learner");h1tutor_data <-  h1 %>% filter(Speaker=="tutor")
+###
+`h1L_airtime%` <- h1total_data[1,2] / sum(h1total_data[,2])
+`h1L_avgTurnLength[s]` <- h1total_data[1,2] / nrow(h1learner_data)
+`h1L_longestTurnLength[s]` <- max(h1learner_data[,"Duration"])
+`h1L_totalTurnLength` <- h1total_data[1,2]
+`h1L_totalTurns` <-  nrow(h1learner_data)
+`h1T_airtime%` <- h1total_data[2,2] / sum(h1total_data[,2])
+`h1T_avgTurnLength[s]` <- h1total_data[2,2] / nrow(h1tutor_data)
+`h1T_longestTurnLength[s]` <- max(h1tutor_data[,"Duration"])
+`h1T_totalTurnLength` <- h1total_data[2,2]
+`h1T_totalTurns` <-  nrow(h1tutor_data)
+#h2
+h2 <- data[(rev(which(data$Time2 < half_paremater))[1]+2):nrow(data),] %>% subset(Duration >threshold)
+h2total_data <- h2 %>% group_by(Speaker) %>% summarise(sum(Duration))
+h2learner_data <- h2 %>% filter(Speaker=="learner");h2tutor_data <-  h2 %>% filter(Speaker=="tutor")
+`h2L_airtime%` <- h2total_data[1,2] / sum(h2total_data[,2])
+`h2L_avgTurnLength[s]` <- h2total_data[1,2] / nrow(h2learner_data)
+`h2L_longestTurnLength[s]` <- max(h2learner_data[,"Duration"])
+`h2L_totalTurnLength` <- h2total_data[1,2]
+`h2L_totalTurns` <-  nrow(h2learner_data)
+`h2T_airtime%` <- h2total_data[2,2] / sum(h2total_data[,2])
+`h2T_avgTurnLength[s]` <- h2total_data[2,2] / nrow(h2tutor_data)
+`h2T_longestTurnLength[s]` <- max(h1tutor_data[,"Duration"])
+`h2T_totalTurnLength` <- h2total_data[2,2]
+`h2T_totalTurns` <-  nrow(h2tutor_data)
+
+s_paremater <- sum(data[,3]) / 3
+s1 <- data[1:(rev(which(data$Time2 < s_paremater))[1]+1),] %>% subset(Duration >threshold)
+s2 <- data[(rev(which(data$Time2 < s_paremater))[1]+2):(rev(which(data$Time2 < s_paremater*2))[1]+1),] %>% subset(Duration >threshold)
+s3 <- data[(rev(which(data$Time2 < s_paremater*2))[1]+2):nrow(data),] %>% subset(Duration >threshold)
+#s1
+s1total_data <- s1 %>% group_by(Speaker) %>% summarise(sum(Duration))
+s1learner_data <- s1 %>% filter(Speaker=="learner");s1tutor_data <-  s1 %>% filter(Speaker=="tutor")
+`s1L_airtime%` <- s1total_data[1,2] / sum(s1total_data[,2])
+`s1L_avgTurnLength[s]` <- s1total_data[1,2] / nrow(s1learner_data)
+`s1L_longestTurnLength[s]` <- max(s1learner_data[,"Duration"])
+`s1L_totalTurnLength` <- s1total_data[1,2]
+`s1L_totalTurns` <-  nrow(s1learner_data)
+`s1T_airtime%` <- s1total_data[2,2] / sum(s1total_data[,2])
+`s1T_avgTurnLength[s]` <- s1total_data[2,2] / nrow(s1tutor_data)
+`s1T_longestTurnLength[s]` <- max(s1tutor_data[,"Duration"])
+`s1T_totalTurnLength` <- s1total_data[2,2]
+`s1T_totalTurns` <-  nrow(s1tutor_data)
+#s2
+s2total_data <- s2 %>% group_by(Speaker) %>% summarise(sum(Duration))
+s2learner_data <- s2 %>% filter(Speaker=="learner");s2tutor_data <-  s2 %>% filter(Speaker=="tutor")
+`s2L_airtime%` <- s2total_data[1,2] / sum(s2total_data[,2])
+`s2L_avgTurnLength[s]` <- s2total_data[1,2] / nrow(s2learner_data)
+`s2L_longestTurnLength[s]` <- max(s2learner_data[,"Duration"])
+`s2L_totalTurnLength` <- s2total_data[1,2]
+`s2L_totalTurns` <-  nrow(s2learner_data)
+`s2T_airtime%` <- s2total_data[2,2] / sum(s2total_data[,2])
+`s2T_avgTurnLength[s]` <- s2total_data[2,2] / nrow(s2tutor_data)
+`s2T_longestTurnLength[s]` <- max(s2tutor_data[,"Duration"])
+`s2T_totalTurnLength` <- s2total_data[2,2]
+`s2T_totalTurns` <-  nrow(s2tutor_data)
+#s3
+s3total_data <- s3 %>% group_by(Speaker) %>% summarise(sum(Duration))
+s3learner_data <- s3 %>% filter(Speaker=="learner");s3tutor_data <-  s3 %>% filter(Speaker=="tutor")
+`s3L_airtime%` <- s3total_data[1,2] / sum(s3total_data[,2])
+`s3L_avgTurnLength[s]` <- s3total_data[1,2] / nrow(s3learner_data)
+`s3L_longestTurnLength[s]` <- max(s3learner_data[,"Duration"])
+`s3L_totalTurnLength` <- s3total_data[1,2]
+`s3L_totalTurns` <-  nrow(s3learner_data)
+`s3T_airtime%` <- s3total_data[2,2] / sum(s3total_data[,2])
+`s3T_avgTurnLength[s]` <- s3total_data[2,2] / nrow(s3tutor_data)
+`s3T_longestTurnLength[s]` <- max(s3tutor_data[,"Duration"])
+`s3T_totalTurnLength` <- s3total_data[2,2]
+`s3T_totalTurns` <-  nrow(s3tutor_data)
+#output
+output <- round(as.numeric(c(`L_airtime%`,`L_avgTurnLength[s]`,`L_longestTurnLength[s]`,`L_totalTurnLength`,`L_totalTurns`,`T_airtime%`,`T_avgTurnLength[s]`,`T_longestTurnLength[s]`,`T_totalTurnLength`,`T_totalTurns`,`Video_time`,`Delta_turn`,`Delta_Time_treshold`,`h1L_airtime%`,`h1L_avgTurnLength[s]`,`h1L_longestTurnLength[s]`,`h1L_totalTurnLength`,`h1L_totalTurns`,`h1T_airtime%`,`h1T_avgTurnLength[s]`,`h1T_longestTurnLength[s]`,`h1T_totalTurnLength`,`h1T_totalTurns`,`h2L_airtime%`,`h2L_avgTurnLength[s]`,`h2L_longestTurnLength[s]`,`h2L_totalTurnLength`,`h2L_totalTurns`,`h2T_airtime%`,`h2T_avgTurnLength[s]`,`h2T_longestTurnLength[s]`,`h2T_totalTurnLength`,`h2T_totalTurns`,`s1L_airtime%`,`s1L_avgTurnLength[s]`,`s1L_longestTurnLength[s]`,`s1L_totalTurnLength`,`s1L_totalTurns`,`s1T_airtime%`,`s1T_avgTurnLength[s]`,`s1T_longestTurnLength[s]`,`s1T_totalTurnLength`,`s1T_totalTurns`,`s2L_airtime%`,`s2L_avgTurnLength[s]`,`s2L_longestTurnLength[s]`,`s2L_totalTurnLength`,`s2L_totalTurns`,`s2T_airtime%`,`s2T_avgTurnLength[s]`,`s2T_longestTurnLength[s]`,`s2T_totalTurnLength`,`s2T_totalTurns`,`s3L_airtime%`,`s3L_avgTurnLength[s]`,`s3L_longestTurnLength[s]`,`s3L_totalTurnLength`,`s3L_totalTurns`,`s3T_airtime%`,`s3T_avgTurnLength[s]`,`s3T_longestTurnLength[s]`,`s3T_totalTurnLength`,`s3T_totalTurns`)),2)
+return(output)}
+
+```
+#excute function here
+```{r}
+#load package(make sure you have downloaded package “tidyverse”)
+library(tidyverse)
+#input file name in read_csv
+raw_data <- read_csv("New_S1018_trans.csv")
+#input 1 as 1st parameter if speaker1 is tutor, 0 otherwise.
+#input threshold as 2nd parameter
+output <- nlp_extraction(0,3,raw_data) 
+write.csv(output, file="test.csv")
+
+```
